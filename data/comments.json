@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Juan Pérez",
+    "comment": "Este es un comentario de prueba.",
+    "detail": "Detalles adicionales sobre el comentario."
+  },
+  {
+    "name": "Jose Josue",
+    "comment": "Otro comentario de prueba.",
+    "detail": "details1"
+  }
+]
