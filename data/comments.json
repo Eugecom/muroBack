@@ -13,5 +13,11 @@
     "name": "Jose Josue",
     "comment": "Otro comentario de prueba.",
     "detail": "details1"
+  },
+  {
+    "name": "Jose Josue",
+    "comment": "Otro comentario de prueba.",
+    "detail": "details1",
+    "urlPicture": "https://fotito-bonita"
   }
 ]

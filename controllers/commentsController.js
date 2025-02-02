@@ -3,13 +3,13 @@ const path = require('path');
 
 // Ruta para agregar un comentario
 const addComment = (req, res) => {
-  const { name, comment, detail } = req.body;
+  const { name, comment, detail, urlPicture } = req.body;
 
-  if (!name || !comment || !detail) {
+  if (!name || !comment || !detail || !urlPicture) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
 
-  const newComment = { name, comment, detail };
+  const newComment = { name, comment, detail, urlPicture };
 
   fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
     if (err) {
@@ -41,10 +41,10 @@ const getComments = (req, res) => {
 
 // Ruta para actualizar un comentario
 const updateComment = (req, res) => {
-  const { name, comment, detail } = req.body;
+  const { name, comment, detail, urlPicture } = req.body;
   const { id } = req.params;
 
-  if (!name || !comment || !detail) {
+  if (!name || !comment || !detail || !urlPicture) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
 
@@ -59,7 +59,7 @@ const updateComment = (req, res) => {
       return res.status(404).json({ error: 'Comentario no encontrado.' });
     }
 
-    comments[id] = { name, comment, detail };
+    comments[id] = { name, comment, detail, urlPicture };
 
     fs.writeFile(path.join(__dirname, '../data/comments.json'), JSON.stringify(comments, null, 2), (err) => {
       if (err) {
