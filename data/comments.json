@@ -1,23 +1,9 @@
 [
   {
-    "name": "Juan Pérez",
-    "comment": "Este es un comentario de prueba.",
-    "detail": "Detalles adicionales sobre el comentario."
-  },
-  {
-    "name": "Jose Josue",
-    "comment": "Otro comentario de prueba.",
-    "detail": "details1"
-  },
-  {
-    "name": "Jose Josue",
-    "comment": "Otro comentario de prueba.",
-    "detail": "details1"
-  },
-  {
+    "id": 1,
     "name": "Jose Josue",
     "comment": "Otro comentario de prueba.",
     "detail": "details1",
-    "urlPicture": "https://fotito-bonita"
+    "urlPicture": "https://res.cloudinary.com/dxbldbqgb/image/upload/v1738541262/avatar_tzpr4l.webp"
   }
 ]

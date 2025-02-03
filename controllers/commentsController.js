@@ -176,19 +176,21 @@ const updateComment = (req, res) => {
 };
 
 // Eliminar comentario
+// Eliminar comentario por posición en el array
 const deleteComment = (req, res) => {
-  const { id } = req.params;
+  const { index } = req.params;  // Usar el índice
   let comments = readComments();
 
-  if (!comments.some((c) => c.id == id)) {
+  if (index < 0 || index >= comments.length) {
     return res.status(404).json({ error: 'Comentario no encontrado.' });
   }
 
-  comments = comments.filter((c) => c.id != id);
+  comments.splice(index, 1); // Eliminar el comentario en la posición indicada
   writeComments(comments);
 
   res.status(200).json({ message: 'Comentario eliminado exitosamente.' });
 };
+
 
 module.exports = {
   addComment,
