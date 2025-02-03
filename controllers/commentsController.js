@@ -109,88 +109,101 @@
 
 
 
-
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 const commentsFile = path.join(__dirname, '../data/comments.json');
 
-// Función para leer comentarios de forma segura
-const readComments = () => {
+// Asegurarse de que el archivo `comments.json` exista, si no, crear uno vacío
+const ensureCommentsFileExists = async () => {
   try {
-    if (!fs.existsSync(commentsFile)) return [];
-    const data = fs.readFileSync(commentsFile, 'utf8');
-    return JSON.parse(data || '[]');
+    await fs.access(commentsFile);
   } catch (err) {
-    console.error('Error al leer el archivo JSON:', err);
+    // Si el archivo no existe, crearlo vacío
+    await fs.writeFile(commentsFile, JSON.stringify([]));
+  }
+};
+
+// Leer los comentarios de forma segura
+const readComments = async () => {
+  await ensureCommentsFileExists(); // Asegurarse de que el archivo existe antes de leerlo
+  try {
+    const rawData = await fs.readFile(commentsFile, 'utf8');
+    const data = JSON.parse(rawData);
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error('Error al leer el archivo de comentarios:', err);
     return [];
   }
 };
 
-// Función para escribir comentarios de forma segura
-const writeComments = (comments) => {
+// Escribir los comentarios en el archivo
+const writeComments = async (comments) => {
   try {
-    fs.writeFileSync(commentsFile, JSON.stringify(comments, null, 2), 'utf8');
+    await fs.writeFile(commentsFile, JSON.stringify(comments, null, 2), 'utf8');
   } catch (err) {
-    console.error('Error al escribir en el archivo JSON:', err);
+    console.error('Error al escribir en el archivo de comentarios:', err);
   }
 };
 
 // Agregar un nuevo comentario
-const addComment = (req, res) => {
+const addComment = async (req, res) => {
   const { name, comment, detail, urlPicture } = req.body;
 
   if (!name || !comment || !detail || !urlPicture) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
 
-  const comments = readComments();
-  const newComment = { id: comments.length + 1, name, comment, detail, urlPicture };
+  const comments = await readComments();
+  const newComment = { name, comment, detail, urlPicture };
+
   comments.push(newComment);
-  writeComments(comments);
+  await writeComments(comments);
 
-  res.status(201).json({ message: 'Comentario guardado exitosamente.' });
+  return res.status(201).json({ message: 'Comentario guardado exitosamente.' });
 };
 
-// Obtener comentarios
-const getComments = (req, res) => {
-  const comments = readComments();
-  res.status(200).json({ comments });
+// Obtener todos los comentarios
+const getComments = async (req, res) => {
+  const comments = await readComments();
+  return res.status(200).json({ comments });
 };
 
-// Actualizar comentario
-const updateComment = (req, res) => {
+// Actualizar un comentario
+const updateComment = async (req, res) => {
+  const id = parseInt(req.params.id, 10);
   const { name, comment, detail, urlPicture } = req.body;
-  const { id } = req.params;
-  const comments = readComments();
 
-  const index = comments.findIndex((c) => c.id == id);
-  if (index === -1) {
-    return res.status(404).json({ error: 'Comentario no encontrado.' });
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'Índice no válido.' });
   }
 
-  comments[index] = { id: Number(id), name, comment, detail, urlPicture };
-  writeComments(comments);
+  const comments = await readComments();
 
-  res.status(200).json({ message: 'Comentario actualizado exitosamente.' });
+  if (id < 0 || id >= comments.length) {
+    return res.status(400).json({ error: 'Índice fuera de rango.' });
+  }
+
+  comments[id] = { name, comment, detail, urlPicture };
+  await writeComments(comments);
+
+  return res.status(200).json({ message: 'Comentario actualizado exitosamente.' });
 };
 
-// Eliminar comentario
-// Eliminar comentario por posición en el array
-const deleteComment = (req, res) => {
-  const { index } = req.params;  // Usar el índice
-  let comments = readComments();
+// Eliminar un comentario
+const deleteComment = async (req, res) => {
+  const { index } = req.params;
+  const comments = await readComments();
 
   if (index < 0 || index >= comments.length) {
     return res.status(404).json({ error: 'Comentario no encontrado.' });
   }
 
-  comments.splice(index, 1); // Eliminar el comentario en la posición indicada
-  writeComments(comments);
+  comments.splice(index, 1);
+  await writeComments(comments);
 
-  res.status(200).json({ message: 'Comentario eliminado exitosamente.' });
+  return res.status(200).json({ message: 'Comentario eliminado exitosamente.' });
 };
-
 
 module.exports = {
   addComment,

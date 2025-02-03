@@ -1,6 +1,11 @@
 [
   {
-    "id": 1,
+    "name": "Juan Pérez",
+    "comment": "Este es un comentario actualizado.",
+    "detail": "Detalles actualizados sobre el comentario.",
+    "urlPicture": "https://res.cloudinary.com/dxbldbqgb/image/upload/v1738541262/avatar_tzpr4l.webp"
+  },
+  {
     "name": "Jose Josue",
     "comment": "Otro comentario de prueba.",
     "detail": "details1",
