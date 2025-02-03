@@ -1,7 +1,142 @@
+// const fs = require('fs');
+// const path = require('path');
+
+// const addComment = (req, res) => {
+//   const { name, comment, detail, urlPicture } = req.body;
+
+//   if (!name || !comment || !detail || !urlPicture) {
+//     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+//   }
+
+//   const newComment = { name, comment, detail, urlPicture };
+
+//   fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
+//     if (err) {
+//       return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
+//     }
+
+//     const comments = JSON.parse(data || '[]');
+//     comments.push(newComment);
+
+//     fs.writeFile(path.join(__dirname, '../data/comments.json'), JSON.stringify(comments, null, 2), (err) => {
+//       if (err) {
+//         return res.status(500).json({ error: 'No se pudo guardar el comentario.' });
+//       }
+//       res.status(201).json({ message: 'Comentario guardado exitosamente.' });
+//     });
+//   });
+// };
+
+// const getComments = (req, res) => {
+//   fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
+//     if (err) {
+//       return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
+//     }
+//     const comments = JSON.parse(data || '[]');
+//     res.status(200).json({ comments });
+//   });
+// };
+
+// const updateComment = (req, res) => {
+//   const { name, comment, detail, urlPicture } = req.body;
+//   const { id } = req.params;
+
+//   if (!name || !comment || !detail || !urlPicture) {
+//     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+//   }
+
+//   fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
+//     if (err) {
+//       return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
+//     }
+
+//     const comments = JSON.parse(data || '[]');
+
+//     if (!comments[id]) {
+//       return res.status(404).json({ error: 'Comentario no encontrado.' });
+//     }
+
+//     comments[id] = { name, comment, detail, urlPicture };
+
+//     fs.writeFile(path.join(__dirname, '../data/comments.json'), JSON.stringify(comments, null, 2), (err) => {
+//       if (err) {
+//         return res.status(500).json({ error: 'No se pudo actualizar el comentario.' });
+//       }
+//       res.status(200).json({ message: 'Comentario actualizado exitosamente.' });
+//     });
+//   });
+// };
+
+// const deleteComment = (req, res) => {
+//   const { id } = req.params;
+
+//   fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
+//     if (err) {
+//       return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
+//     }
+
+//     const comments = JSON.parse(data || '[]');
+
+//     if (!comments[id]) {
+//       return res.status(404).json({ error: 'Comentario no encontrado.' });
+//     }
+
+//     comments.splice(id, 1);
+
+//     fs.writeFile(path.join(__dirname, '../data/comments.json'), JSON.stringify(comments, null, 2), (err) => {
+//       if (err) {
+//         return res.status(500).json({ error: 'No se pudo eliminar el comentario.' });
+//       }
+//       res.status(200).json({ message: 'Comentario eliminado exitosamente.' });
+//     });
+//   });
+// };
+
+// module.exports = {
+//   addComment,
+//   getComments,
+//   updateComment,
+//   deleteComment,
+// };
+
+
+
+
+
+
+
+
+
+
+
+
 const fs = require('fs');
 const path = require('path');
 
-// Ruta para agregar un comentario
+const commentsFile = path.join(__dirname, '../data/comments.json');
+
+// Función para leer comentarios de forma segura
+const readComments = () => {
+  try {
+    if (!fs.existsSync(commentsFile)) return [];
+    const data = fs.readFileSync(commentsFile, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (err) {
+    console.error('Error al leer el archivo JSON:', err);
+    return [];
+  }
+};
+
+// Función para escribir comentarios de forma segura
+const writeComments = (comments) => {
+  try {
+    fs.writeFileSync(commentsFile, JSON.stringify(comments, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error al escribir en el archivo JSON:', err);
+  }
+};
+
+// Agregar un nuevo comentario
 const addComment = (req, res) => {
   const { name, comment, detail, urlPicture } = req.body;
 
@@ -9,91 +144,50 @@ const addComment = (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
 
-  const newComment = { name, comment, detail, urlPicture };
+  const comments = readComments();
+  const newComment = { id: comments.length + 1, name, comment, detail, urlPicture };
+  comments.push(newComment);
+  writeComments(comments);
 
-  fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
-    }
-
-    const comments = JSON.parse(data || '[]');
-    comments.push(newComment);
-
-    fs.writeFile(path.join(__dirname, '../data/comments.json'), JSON.stringify(comments, null, 2), (err) => {
-      if (err) {
-        return res.status(500).json({ error: 'No se pudo guardar el comentario.' });
-      }
-      res.status(201).json({ message: 'Comentario guardado exitosamente.' });
-    });
-  });
+  res.status(201).json({ message: 'Comentario guardado exitosamente.' });
 };
 
-// Ruta para leer los comentarios
+// Obtener comentarios
 const getComments = (req, res) => {
-  fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
-    }
-    const comments = JSON.parse(data || '[]');
-    res.status(200).json({ comments });
-  });
+  const comments = readComments();
+  res.status(200).json({ comments });
 };
 
-// Ruta para actualizar un comentario
+// Actualizar comentario
 const updateComment = (req, res) => {
   const { name, comment, detail, urlPicture } = req.body;
   const { id } = req.params;
+  const comments = readComments();
 
-  if (!name || !comment || !detail || !urlPicture) {
-    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  const index = comments.findIndex((c) => c.id == id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Comentario no encontrado.' });
   }
 
-  fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
-    }
+  comments[index] = { id: Number(id), name, comment, detail, urlPicture };
+  writeComments(comments);
 
-    const comments = JSON.parse(data || '[]');
-
-    if (!comments[id]) {
-      return res.status(404).json({ error: 'Comentario no encontrado.' });
-    }
-
-    comments[id] = { name, comment, detail, urlPicture };
-
-    fs.writeFile(path.join(__dirname, '../data/comments.json'), JSON.stringify(comments, null, 2), (err) => {
-      if (err) {
-        return res.status(500).json({ error: 'No se pudo actualizar el comentario.' });
-      }
-      res.status(200).json({ message: 'Comentario actualizado exitosamente.' });
-    });
-  });
+  res.status(200).json({ message: 'Comentario actualizado exitosamente.' });
 };
 
-// Ruta para eliminar un comentario
+// Eliminar comentario
 const deleteComment = (req, res) => {
   const { id } = req.params;
+  let comments = readComments();
 
-  fs.readFile(path.join(__dirname, '../data/comments.json'), 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).json({ error: 'No se pudieron leer los comentarios.' });
-    }
+  if (!comments.some((c) => c.id == id)) {
+    return res.status(404).json({ error: 'Comentario no encontrado.' });
+  }
 
-    const comments = JSON.parse(data || '[]');
+  comments = comments.filter((c) => c.id != id);
+  writeComments(comments);
 
-    if (!comments[id]) {
-      return res.status(404).json({ error: 'Comentario no encontrado.' });
-    }
-
-    comments.splice(id, 1);
-
-    fs.writeFile(path.join(__dirname, '../data/comments.json'), JSON.stringify(comments, null, 2), (err) => {
-      if (err) {
-        return res.status(500).json({ error: 'No se pudo eliminar el comentario.' });
-      }
-      res.status(200).json({ message: 'Comentario eliminado exitosamente.' });
-    });
-  });
+  res.status(200).json({ message: 'Comentario eliminado exitosamente.' });
 };
 
 module.exports = {
