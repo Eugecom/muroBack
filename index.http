@@ -3,13 +3,15 @@ POST http://localhost:3222/api
 Content-Type: application/json
 
 {
-  "name": "Jose Josue",
-  "comment": "Otro comentario de prueba.",
-  "detail": "details1"
+  "name": "pedro Pedraza",
+  "comment": "El mas picante del condado.",
+  "detail": "details2", 
+  "urlPicture" : "https://res.cloudinary.com/dxbldbqgb/image/upload/v1738541262/avatar_tzpr4l.webp"
 }
 
 ###
 GET http://localhost:3222/api
+Content-Type: application/json
 
 ###
 
@@ -19,7 +21,8 @@ Content-Type: application/json
 {
   "name": "Juan Pérez",
   "comment": "Este es un comentario actualizado.",
-  "detail": "Detalles actualizados sobre el comentario."
+  "detail": "Detalles actualizados sobre el comentario.", 
+  "urlPicture" : "https://res.cloudinary.com/dxbldbqgb/image/upload/v1738541262/avatar_tzpr4l.webp"
 }
 
 ###
