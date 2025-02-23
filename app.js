@@ -74,7 +74,7 @@ app.use('/api', commentsRoutes);
 app.get('/sitemap.xml', async (req, res) => {
     res.header('Content-Type', 'application/xml');
 
-    const hostname = 'https://www.murodemontana.com';  // Cambia esto por tu dominio real
+    const hostname = 'https://murodemontana.com';  // Cambia esto por tu dominio real
     const sitemap = new SitemapStream({ hostname });
 
     // Rutas del sitio

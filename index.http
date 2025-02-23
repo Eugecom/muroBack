@@ -28,3 +28,4 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:3222/api/0
+Content-Type: application/json
