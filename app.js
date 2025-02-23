@@ -66,12 +66,20 @@ const path = require('path');  // Importar path para manejar rutas correctamente
 
 const app = express();
 
+const corsOptions = {
+    origin: 'https://murodemontana.com',
+    methods: 'GET',
+    allowedHeaders: 'Content-Type'
+  };
+
 app.use(bodyParser.json());
-app.use(cors());
+//app.use(cors());
+app.use(cors(corsOptions));
 app.use('/api', commentsRoutes);
 
 // Servir el sitemap antes de servir React
 app.get('/sitemap.xml', async (req, res) => {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
     res.header('Content-Type', 'application/xml');
 
     const hostname = 'https://murodemontana.com';  // Cambia esto por tu dominio real
